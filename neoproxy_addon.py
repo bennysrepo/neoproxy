@@ -35,6 +35,10 @@ def request(flow):
     elif _is_play_flash_request(url):
         _handle_play_flash_cache(flow)
     
+    # Fix malformed URLs with duplicate prefixes (check first)
+    if _is_malformed_url(url):
+        _handle_malformed_url(flow)
+    
     # Handle URL rewriting for SWF and config files
     elif _is_swf_or_config_request(url):
         _handle_url_rewrite(flow)
@@ -114,6 +118,18 @@ def _is_swf_or_config_request(url: str) -> bool:
         "/config.xml" in url or 
         "/shellconfig.xml" in url
     )
+
+def _is_malformed_url(url: str) -> bool:
+    """Check if URL has duplicate https://images.neopets.com/games/ prefixes."""
+    is_malformed = (
+        "neopets.com" in url and
+        "https://images.neopets.com/games/https://images.neopets.com/games/" in url
+    )
+    
+    if is_malformed:
+        print(f"🔍 DETECTED MALFORMED URL: {url}")
+    
+    return is_malformed
 
 def _handle_url_rewrite(flow) -> None:
     """Handle URL rewriting for SWF and config files."""
@@ -202,6 +218,22 @@ def done():
     
     if blocked_requests:
         print(f"📊 Blocked {len(blocked_requests)} requests") 
+
+def _handle_malformed_url(flow) -> None:
+    """Fix malformed URLs with duplicate prefixes."""
+    original_url = flow.request.url
+    
+    # Remove the duplicate prefix
+    fixed_url = original_url.replace(
+        "https://images.neopets.com/games/https://images.neopets.com/games/",
+        "https://images.neopets.com/games/"
+    )
+    
+    # Update the request URL and host
+    flow.request.url = fixed_url
+    flow.request.host = "images.neopets.com"
+    
+    print(f"🔧 Fixed malformed URL: {original_url[:100]}... -> {fixed_url[:100]}...")
 
 def _is_game_page_response(flow) -> bool:
     """Check if this is a game page HTML response."""
