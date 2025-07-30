@@ -71,9 +71,21 @@ pip install -r requirements.txt
 
 ### Setup
 
-1. **Start the proxy**:
+1. **Start the proxy** (choose your OS):
+
+   **Windows:**
+   ```cmd
+   python start_proxy.py
+   ```
+   
+   **macOS/Linux:**
    ```bash
-   python neoproxy_addon.py
+   python start_proxy.py
+   ```
+   
+   **Alternative (macOS/Linux only):**
+   ```bash
+   ./start_proxy.sh
    ```
 
 2. **Generate mitmproxy certificate**:
@@ -171,7 +183,9 @@ The proxy uses advanced request interception to:
 ```
 neoproxy/
 ├── neoproxy_addon.py    # Main proxy addon
-├── start_proxy.sh       # Startup script
+├── start_proxy.py       # Cross-platform startup script
+├── start_proxy.sh       # Unix startup script (alternative)
+├── start_proxy.bat      # Windows startup script (alternative)
 ├── requirements.txt     # Python dependencies
 ├── README.md           # This file
 └── assets/
